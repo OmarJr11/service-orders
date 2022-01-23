@@ -27,7 +27,7 @@ export class User {
   @Column('character varying', { name: 'telephone', length: 50 })
   telephone?: string;
 
-  @Column('character varying', { name: 'status', length: 20 })
+  @Column('character varying', { name: 'type', length: 20 })
   type: string;
 
   @Column('text', {
