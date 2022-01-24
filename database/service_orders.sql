@@ -24,7 +24,7 @@ CREATE TABLE system.users (
     status              VARCHAR(50)     NOT NULL,
     telephone           VARCHAR(50)     NULL,
     type                VARCHAR(20)     NOT NULL,
-    services            TEXT[]          NOT NULL,
+    services            TEXT[]          NULL,
 
     creation_date       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -40,6 +40,7 @@ CREATE TABLE service (
     id              BIGSERIAL       NOT NULL,
     
     name            VARCHAR(50)     NOT NULL,
+    price           dec_nonnegative NOT NULL, 
     status          VARCHAR(50)     NOT NULL,
 
     creation_date       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -53,43 +54,42 @@ CREATE TABLE service (
 CREATE UNIQUE INDEX service_uq_idx ON service USING btree(lower(name)) WHERE status <> 'Deleted';
 
 CREATE TABLE service_request (
-    id              BIGSERIAL       NOT NULL,
+    id                  BIGSERIAL       NOT NULL,
     
-    id_user         BIGSERIAL       NOT NULL,
-    id_service      BIGSERIAL       NOT NULL,
-    price           dec_nonnegative NOT NULL, 
-    status          VARCHAR(50)     NOT NULL,
+    technical           BIGSERIAL       NOT NULL,
+    ticket              BIGSERIAL       NOT NULL,
+    status              VARCHAR(50)     NOT NULL,
 
     creation_date       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     modification_date   TIMESTAMP       NULL,
 
     PRIMARY KEY(id),
-    FOREIGN KEY (id_user)           REFERENCES system.users(id),
-    FOREIGN KEY (id_service)        REFERENCES service(id)
+    FOREIGN KEY (technical)             REFERENCES system.users(id),
+    FOREIGN KEY (ticket)                REFERENCES ticket(id)
 );
 
 CREATE TABLE ticket (
-    id              BIGSERIAL       NOT NULL,
-    
-    id_technical    BIGSERIAL       NOT NULL,
-    id_request      BIGSERIAL       NOT NULL,
-    price           dec_nonnegative NOT NULL, 
-    status          VARCHAR(50)     NOT NULL,
+    id                  BIGSERIAL       NOT NULL,
+
+    service             BIGSERIAL       NOT NULL,
+    user                BIGSERIAL       NOT NULL,
+    token               VARCHAR(100)    NOT NULL,
+    status              VARCHAR(50)     NOT NULL,
 
     creation_date       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     modification_date   TIMESTAMP       NULL,
 
     PRIMARY KEY(id),
-    FOREIGN KEY (id_technical)       REFERENCES system.users(id),
-    FOREIGN KEY (id_request)        REFERENCES service_request(id)
+    FOREIGN KEY (service)            REFERENCES service(id),
+    FOREIGN KEY (user)               REFERENCES system.users(id)
 );
 
-INSERT INTO service ( id, name, status, creation_date) 
-values  (0, 'Maintenance', 'Active', CURRENT_TIMESTAMP),
-        (1, 'Support', 'Active', CURRENT_TIMESTAMP),
-        (2, 'Installation', 'Active', CURRENT_TIMESTAMP),
-        (3, 'Repair', 'Active', CURRENT_TIMESTAMP);
+INSERT INTO service ( id, name, price, status, creation_date) 
+values  (0, 'Maintenance', 50, 'Active', CURRENT_TIMESTAMP),
+        (1, 'Support', 60, 'Active', CURRENT_TIMESTAMP),
+        (2, 'Installation', 70, 'Active', CURRENT_TIMESTAMP),
+        (3, 'Repair', 80, 'Active', CURRENT_TIMESTAMP);
 
 SELECT pg_catalog.setval('service_id_seq', 4, FALSE);

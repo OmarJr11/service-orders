@@ -1,10 +1,10 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataProvider } from 'src/common/providers/data.provider';
-import { RolesEnum } from 'src/common/enum/roles.enum';
-import { Status } from 'src/common/enum/status.enum';
-import { User } from 'src/models/user.entity';
-import { ServiceService } from 'src/modules/public/service/service.service';
+import { DataProvider } from '../../../common/providers/data.provider';
+import { RolesEnum } from '../../../common/enum/roles.enum';
+import { Status } from '../../../common/enum/status.enum';
+import { User } from '../../../models/user.entity';
+import { ServiceService } from '../../../modules/public/service/service.service';
 import { Not, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -21,7 +21,7 @@ export class UsersService extends DataProvider<User> {
 
   /**
    * Add Service to technical
-   * @param {number} id - User id 
+   * @param {number} id - User id
    * @param {string} service - service to add
    * @returns {Promise<string[]>}
    */
@@ -107,7 +107,7 @@ export class UsersService extends DataProvider<User> {
     const users = await this._userRepository.find(options).catch(() => {
       throw new ForbiddenException({
         success: false,
-        message: 'User not exist',
+        message: 'You do not have permission',
       });
     });
 
@@ -224,8 +224,6 @@ export class UsersService extends DataProvider<User> {
    * @returns {Promise<string>}
    */
   async removeService(id: number, service: string): Promise<string[]> {
-    console.log(id);
-
     const user = await this.findOne(id);
     const updateService = user.services.filter((s) => s !== service);
 

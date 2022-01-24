@@ -15,6 +15,13 @@ export class Service {
   @Column('character varying', { name: 'name', length: 50, unique: true })
   name: string;
 
+  @Column('numeric', {
+    name: 'price',
+    precision: 18,
+    scale: 4,
+  })
+  price: number;
+
   @Column('character varying', { name: 'status', length: 50 })
   status: string;
 

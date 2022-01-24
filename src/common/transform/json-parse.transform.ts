@@ -1,7 +1,5 @@
 export function JsonParse<T = any>(value: T): any {
   let valToReturn = null;
-  console.log(value);
-  
 
   if (typeof value['value'] === 'string') {
     try {
@@ -12,10 +10,7 @@ export function JsonParse<T = any>(value: T): any {
     }
   } else {
     valToReturn = value['value'];
-  }
-
-  console.log(valToReturn);
-  
+  }  
 
   return valToReturn;
 }

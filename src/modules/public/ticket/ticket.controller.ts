@@ -1,34 +1,49 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put } from '@nestjs/common';
 import { TicketService } from './ticket.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
-import { UpdateTicketDto } from './dto/update-ticket.dto';
+import { Status } from '../../../common/enum/status.enum';
 
 @Controller('ticket')
 export class TicketController {
   constructor(private readonly ticketService: TicketService) {}
 
   @Post()
-  create(@Body() createTicketDto: CreateTicketDto) {
-    return this.ticketService.create(createTicketDto);
+  async create(@Body() createTicketDto: CreateTicketDto) {
+    return {
+      success: true,
+      ticket: await this.ticketService.create(createTicketDto),
+    };
   }
 
   @Get()
-  findAll() {
-    return this.ticketService.findAll();
+  async findAll() {
+    return {
+      success: true,
+      ticket: await this.ticketService.findAll(),
+    };
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ticketService.findOne(+id);
+  async findOne(@Param('id') id: number) {
+    return {
+      success: true,
+      ticket: await this.ticketService.findOne(id),
+    };
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTicketDto: UpdateTicketDto) {
-    return this.ticketService.update(+id, updateTicketDto);
+  @Put(':id/managed')
+  async managed(@Param('id') id: number) {
+    return {
+      success: true,
+      ticket: await this.ticketService.changeStatus(id, Status.MANAGED),
+    };
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ticketService.remove(+id);
+  @Put(':id/cancelled')
+  async cancelled(@Param('id') id: number) {
+    return {
+      success: true,
+      ticket: await this.ticketService.changeStatus(id, Status.CANCELLED),
+    };
   }
 }

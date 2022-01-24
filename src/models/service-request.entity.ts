@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Service } from './service.entity';
+import { Ticket } from './ticket.entity';
 import { User } from './user.entity';
 
 @Index('service_request_pkey', ['id'], { unique: true })
@@ -17,12 +17,12 @@ export class ServiceRequest {
   id: number;
 
   @ManyToOne(() => User, (user) => user.id)
-  @JoinColumn([{ name: 'id_user', referencedColumnName: 'id' }])
-  idUser: number | User;
+  @JoinColumn([{ name: 'technical', referencedColumnName: 'id' }])
+  technical: number | User;
 
-  @ManyToOne(() => Service, (service) => service.id)
-  @JoinColumn([{ name: 'id_service', referencedColumnName: 'id' }])
-  idService: number | Service;
+  @ManyToOne(() => Ticket, (ticket) => ticket.id)
+  @JoinColumn([{ name: 'ticket', referencedColumnName: 'id' }])
+  ticket: number | Ticket;
 
   @Column('character varying', { name: 'status', length: 50 })
   status: string;
