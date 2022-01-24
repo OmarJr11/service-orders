@@ -1,1 +1,14 @@
-export class CreateTicketDto {}
+import { Type } from 'class-transformer';
+import { IsNotEmpty, IsNumber } from 'class-validator';
+
+export class CreateTicketDto {
+  @IsNotEmpty()
+  @Type(() => Number)
+  @IsNumber()
+  idService: number;
+
+  @IsNotEmpty()
+  @Type(() => Number)
+  @IsNumber()
+  idUser: number;
+}

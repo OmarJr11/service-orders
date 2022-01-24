@@ -1,4 +1,4 @@
-import { Status } from 'src/common/enum/status.enum';
+import { Status } from '../../common/enum/status.enum';
 import { ObjectLiteral, Repository } from 'typeorm';
 
 export class DataProvider<Entity extends ObjectLiteral> {
@@ -43,6 +43,7 @@ export class DataProvider<Entity extends ObjectLiteral> {
 
     const characters =
       options && options.trim() !== '' ? options : process.env.ENCRYPTION_CHARS;
+    console.log(process.env.ENCRYPTION_CHARS);
 
     for (let i = 0; i < length; i++) {
       result += characters.charAt(
@@ -90,8 +91,7 @@ export class DataProvider<Entity extends ObjectLiteral> {
   ): Promise<Entity> {
     data.status =
       !data.status || data.status.trim() === '' ? 'Active' : data.status.trim();
-    console.log(data);
-    
+
     const savedEntity = await this._repository.save(data);
 
     return this.cleanDataAfterSave(
@@ -109,7 +109,7 @@ export class DataProvider<Entity extends ObjectLiteral> {
   protected async updateEntity(
     entity: Entity,
     dataToUpdate: any,
-    user: number,
+    user?: number,
   ): Promise<Entity> {
     if (!isNaN(+user)) {
       dataToUpdate.modifier = +user;
