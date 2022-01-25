@@ -59,40 +59,6 @@ CREATE TABLE system.roles (
     FOREIGN KEY (modifier)  REFERENCES system.users(id)
 );
 
-CREATE TABLE system.permissions (
-    id                  SERIAL		    NOT NULL,
-
-    name     			VARCHAR(50)	    NOT NULL,
-	status				VARCHAR(50)	    NOT NULL,
-	type				VARCHAR(50)	    NOT NULL,
-
-    creator             BIGINT          NOT NULL,
-    creation_date       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    modifier            BIGINT          NULL,
-    modification_date   TIMESTAMP       NULL,
-
-    PRIMARY KEY (id),
-	UNIQUE(name,type),
-    FOREIGN KEY (creator)   REFERENCES system.users(id),
-    FOREIGN KEY (modifier)  REFERENCES system.users(id)
-);
-
-CREATE TABLE system.role_permissions (
-    id          BIGSERIAL   NOT NULL,
-    role        INT         NOT NULL,
-	permission  INT         NOT NULL,
-
-    creator             BIGINT          NOT NULL,
-    creation_date       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    PRIMARY KEY (id),
-    UNIQUE(role, permission),
-    FOREIGN KEY (role)     	    REFERENCES system.roles(id),
-    FOREIGN KEY (permission)	REFERENCES system.permissions(id),
-    FOREIGN KEY (creator)	    REFERENCES system.users(id)
-);
-
 CREATE TABLE system.user_roles (
     id      BIGSERIAL   NOT NULL,
 
@@ -152,7 +118,6 @@ CREATE TABLE tickets (
     id                  BIGSERIAL       NOT NULL,
 
     service             BIGSERIAL       NOT NULL,
-    "user"              BIGSERIAL       NOT NULL,
     token               VARCHAR(100)    NOT NULL,
     status              VARCHAR(50)     NOT NULL,
 
@@ -171,8 +136,8 @@ CREATE TABLE tickets (
 CREATE TABLE service_request (
     id                  BIGSERIAL       NOT NULL,
     
-    ticket              BIGSERIAL       NOT NULL,
     technical           BIGSERIAL       NOT NULL,
+    ticket              BIGSERIAL       NOT NULL,
     status              VARCHAR(50)     NOT NULL,
 
     creator             BIGINT          NOT NULL,
