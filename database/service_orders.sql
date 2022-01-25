@@ -20,21 +20,111 @@ CREATE TABLE system.users (
 
     first_name          VARCHAR(50)     NOT NULL,
     last_name           VARCHAR(50)     NOT NULL,
+    password            VARCHAR(100)    NULL,
     email               VARCHAR(100)    NOT NULL,
     status              VARCHAR(50)     NOT NULL,
     telephone           VARCHAR(50)     NULL,
-    type                VARCHAR(20)     NOT NULL,
     services            TEXT[]          NULL,
 
+    creator             BIGINT          NULL,
     creation_date       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
+    modifier            BIGINT          NULL,
     modification_date   TIMESTAMP       NULL,
 
-    PRIMARY KEY (id)
+    last_login          TIMESTAMP       NULL,
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (creator)   REFERENCES system.users(id),
+    FOREIGN KEY (modifier)  REFERENCES system.users(id)
 );
 
 CREATE UNIQUE INDEX users_email_uq ON system.users USING btree(lower(email)) WHERE status <> 'Deleted';
-CREATE UNIQUE INDEX users_telephone_uq ON system.users USING btree(lower(telephone)) WHERE status <> 'Deleted';
+
+CREATE TABLE system.roles (
+    id                  SERIAL		    NOT NULL,
+
+    name     			VARCHAR(50)	    NOT NULL,
+	status				VARCHAR(50)	    NOT NULL,
+
+    creator             BIGINT          NOT NULL,
+    creation_date       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    modifier            BIGINT          NULL,
+    modification_date   TIMESTAMP       NULL,
+
+    PRIMARY KEY (id),
+	UNIQUE(name),
+    FOREIGN KEY (creator)   REFERENCES system.users(id),
+    FOREIGN KEY (modifier)  REFERENCES system.users(id)
+);
+
+CREATE TABLE system.permissions (
+    id                  SERIAL		    NOT NULL,
+
+    name     			VARCHAR(50)	    NOT NULL,
+	status				VARCHAR(50)	    NOT NULL,
+	type				VARCHAR(50)	    NOT NULL,
+
+    creator             BIGINT          NOT NULL,
+    creation_date       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    modifier            BIGINT          NULL,
+    modification_date   TIMESTAMP       NULL,
+
+    PRIMARY KEY (id),
+	UNIQUE(name,type),
+    FOREIGN KEY (creator)   REFERENCES system.users(id),
+    FOREIGN KEY (modifier)  REFERENCES system.users(id)
+);
+
+CREATE TABLE system.role_permissions (
+    id          BIGSERIAL   NOT NULL,
+    role        INT         NOT NULL,
+	permission  INT         NOT NULL,
+
+    creator             BIGINT          NOT NULL,
+    creation_date       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    UNIQUE(role, permission),
+    FOREIGN KEY (role)     	    REFERENCES system.roles(id),
+    FOREIGN KEY (permission)	REFERENCES system.permissions(id),
+    FOREIGN KEY (creator)	    REFERENCES system.users(id)
+);
+
+CREATE TABLE system.user_roles (
+    id      BIGSERIAL   NOT NULL,
+
+    "user"  BIGINT 	    NOT NULL,
+	"role"  INT 	    NOT NULL,
+	status  VARCHAR(50) NOT NULL,
+
+    creator             BIGINT          NOT NULL,
+    creation_date       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    modifier            BIGINT          NULL,
+    modification_date   TIMESTAMP       NULL,
+
+    PRIMARY KEY(id),
+    UNIQUE ("user", "role"),
+    FOREIGN KEY (role)      REFERENCES system.roles(id),
+    FOREIGN KEY ("user")    REFERENCES system.users(id),
+    FOREIGN KEY (creator)   REFERENCES system.users(id),
+    FOREIGN KEY (modifier)  REFERENCES system.users(id)
+);
+
+CREATE TABLE system.refresh_tokens(
+    "user"              BIGINT          NOT NULL,
+    token               VARCHAR(400)    NOT NULL,
+    refresh             VARCHAR(400)    NOT NULL,
+    expire              TIMESTAMP       NOT NULL,
+
+    creation_date       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY ("user", token),
+    FOREIGN KEY ("user") REFERENCES system.users(id)
+);
 
 CREATE TABLE service (
     id              BIGSERIAL       NOT NULL,
@@ -43,53 +133,77 @@ CREATE TABLE service (
     price           dec_nonnegative NOT NULL, 
     status          VARCHAR(50)     NOT NULL,
 
+    creator             BIGINT          NOT NULL,
     creation_date       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
+    modifier            BIGINT          NULL,
     modification_date   TIMESTAMP       NULL,
 
     PRIMARY KEY (id),
-    UNIQUE (name)
+    UNIQUE (name),
+    FOREIGN KEY (creator)   REFERENCES  system.users(id),
+    FOREIGN KEY (modifier)  REFERENCES  system.users(id)
 );
 
 CREATE UNIQUE INDEX service_uq_idx ON service USING btree(lower(name)) WHERE status <> 'Deleted';
 
-CREATE TABLE service_request (
-    id                  BIGSERIAL       NOT NULL,
-    
-    technical           BIGSERIAL       NOT NULL,
-    ticket              BIGSERIAL       NOT NULL,
-    status              VARCHAR(50)     NOT NULL,
 
-    creation_date       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    modification_date   TIMESTAMP       NULL,
-
-    PRIMARY KEY(id),
-    FOREIGN KEY (technical)             REFERENCES system.users(id),
-    FOREIGN KEY (ticket)                REFERENCES ticket(id)
-);
-
-CREATE TABLE ticket (
+CREATE TABLE tickets (
     id                  BIGSERIAL       NOT NULL,
 
     service             BIGSERIAL       NOT NULL,
-    user                BIGSERIAL       NOT NULL,
+    "user"              BIGSERIAL       NOT NULL,
     token               VARCHAR(100)    NOT NULL,
     status              VARCHAR(50)     NOT NULL,
 
+    creator             BIGINT          NOT NULL,
     creation_date       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
+    modifier            BIGINT          NULL,
     modification_date   TIMESTAMP       NULL,
 
     PRIMARY KEY(id),
-    FOREIGN KEY (service)            REFERENCES service(id),
-    FOREIGN KEY (user)               REFERENCES system.users(id)
+    FOREIGN KEY (service)               REFERENCES service(id),
+    FOREIGN KEY (creator)               REFERENCES  system.users(id),
+    FOREIGN KEY (modifier)              REFERENCES  system.users(id)
 );
 
-INSERT INTO service ( id, name, price, status, creation_date) 
-values  (0, 'Maintenance', 50, 'Active', CURRENT_TIMESTAMP),
-        (1, 'Support', 60, 'Active', CURRENT_TIMESTAMP),
-        (2, 'Installation', 70, 'Active', CURRENT_TIMESTAMP),
-        (3, 'Repair', 80, 'Active', CURRENT_TIMESTAMP);
+CREATE TABLE service_request (
+    id                  BIGSERIAL       NOT NULL,
+    
+    ticket              BIGSERIAL       NOT NULL,
+    technical           BIGSERIAL       NOT NULL,
+    status              VARCHAR(50)     NOT NULL,
+
+    creator             BIGINT          NOT NULL,
+    creation_date       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    modifier            BIGINT          NULL,
+    modification_date   TIMESTAMP       NULL,
+
+    PRIMARY KEY(id),
+    FOREIGN KEY (ticket)                REFERENCES  tickets(id),
+    FOREIGN KEY (technical)             REFERENCES  system.users(id),
+    FOREIGN KEY (creator)               REFERENCES  system.users(id),
+    FOREIGN KEY (modifier)              REFERENCES  system.users(id)
+);
+
+INSERT INTO system.users (  id, first_name, last_name, password, email, status, telephone, creation_date) 
+values(0, 'admin', 'admin', '', 'admin@delivery.com', 'Active', '', CURRENT_TIMESTAMP);
+
+SELECT pg_catalog.setval('system.users_id_seq', 1, FALSE);
+
+INSERT INTO system.roles (id, name, status, creator) 
+values  (1, 'User', 'Active', 0),
+        (2, 'Admin', 'Active', 0),
+        (3, 'Technical', 'Active', 0);
+
+SELECT pg_catalog.setval('system.roles_id_seq', 4, FALSE);
+
+INSERT INTO service ( id, name, price, status, creator, creation_date) 
+values  (0, 'Maintenance', 50, 'Active', 0, CURRENT_TIMESTAMP),
+        (1, 'Support', 60, 'Active', 0, CURRENT_TIMESTAMP),
+        (2, 'Installation', 70, 'Active', 0, CURRENT_TIMESTAMP),
+        (3, 'Repair', 80, 'Active', 0, CURRENT_TIMESTAMP);
 
 SELECT pg_catalog.setval('service_id_seq', 4, FALSE);

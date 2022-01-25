@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RolesEnum } from '../../../common/enum/roles.enum';
 import { Status } from '../../../common/enum/status.enum';
@@ -9,16 +9,21 @@ import { UsersService } from '../../../modules/system/users/users.service';
 import { Repository } from 'typeorm';
 import { ServiceService } from '../service/service.service';
 import { CreateServiceRequestDto } from './dto/create-service-request.dto';
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
+import { IUserReq } from '../../../common/interfaces/user-req.interface';
 
 @Injectable()
 export class ServiceRequestService extends DataProvider<ServiceRequest> {
   constructor(
+    @Inject(REQUEST)
+    private readonly _userRequest: Request,
     @InjectRepository(ServiceRequest)
     private readonly _serviceRequestRepository: Repository<ServiceRequest>,
     private readonly _servicesService: ServiceService,
     private readonly _usersService: UsersService,
   ) {
-    super(_serviceRequestRepository);
+    super(_userRequest, _serviceRequestRepository);
   }
 
   /**
@@ -37,7 +42,6 @@ export class ServiceRequestService extends DataProvider<ServiceRequest> {
         createServiceRequestDto.service,
       ),
     );
-
     const serviceRequest = await this.save({
       technical: technical.id,
       ticket: createServiceRequestDto.idTicket,
@@ -53,17 +57,18 @@ export class ServiceRequestService extends DataProvider<ServiceRequest> {
 
   /**
    * Get All services requests of technical
-   * @param technical - Technical id
+   * @param user - user with role technical
    * @returns {Promise<ServiceRequest>}
    */
-  async find(technical: number): Promise<ServiceRequest[]> {
-    await this._usersService.findOneByIdAndType(technical, RolesEnum.TECHNICAL);
+  async find(user: IUserReq): Promise<ServiceRequest[]> {
+    await this._usersService.getUserWithRole(+user.userId, RolesEnum.TECHNICAL)
 
     const serviceRequests = await this._serviceRequestRepository
       .createQueryBuilder('SR')
-      .leftJoinAndSelect('SR.technical', 'T')
       .leftJoinAndSelect('SR.ticket', 'TI')
-      .where('SR.technical = :technical', { technical })
+      .leftJoinAndSelect('TI.service', 'S')
+      .leftJoinAndSelect('TI.creator', 'C')
+      .where('SR.technical = :technical', { technical: user.userId })
       .andWhere('SR.status = :status', { status: Status.ACTIVE })
       .getMany()
       .catch(() => {
@@ -121,10 +126,7 @@ export class ServiceRequestService extends DataProvider<ServiceRequest> {
    * @param service - Service to run
    * @returns {User[]}
    */
-  private getTechniciansAvailable(
-    technicians: User[],
-    service: string,
-  ): User[] {
+  private getTechniciansAvailable(technicians: any[], service: string): User[] {
     const techniciansAvailable = [];
     for (const t of technicians) {
       t.services.map((s) => {
@@ -133,6 +135,7 @@ export class ServiceRequestService extends DataProvider<ServiceRequest> {
         }
       });
     }
+
     return techniciansAvailable;
   }
 }

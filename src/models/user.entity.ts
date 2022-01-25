@@ -18,6 +18,14 @@ export class User {
   @Column('character varying', { name: 'last_name', length: 50 })
   lastName: string;
 
+  @Column('character varying', {
+    name: 'password',
+    length: 100,
+    nullable: true,
+    select: false,
+  })
+  password?: string;
+
   @Column('character varying', { name: 'email', length: 100 })
   email: string;
 
@@ -27,9 +35,6 @@ export class User {
   @Column('character varying', { name: 'telephone', length: 50 })
   telephone?: string;
 
-  @Column('character varying', { name: 'type', length: 20 })
-  type: string;
-
   @Column('text', {
     array: true,
     name: 'services',
@@ -38,12 +43,18 @@ export class User {
   })
   services?: string[];
 
+  @Column('int8', { name: 'creator', nullable: true, select: false })
+  creator?: number;
+
   @Column('timestamp without time zone', {
     name: 'creation_date',
     select: false,
     default: () => 'CURRENT_TIMESTAMP',
   })
   creationDate?: Date;
+
+  @Column('int8', { name: 'modifier', nullable: true, select: false })
+  modifier?: number;
 
   @UpdateDateColumn({
     type: 'timestamp without time zone',
@@ -52,4 +63,12 @@ export class User {
     select: false,
   })
   modificationDate?: Date;
+
+  @Column({
+    type: 'timestamp without time zone',
+    name: 'last_login',
+    nullable: true,
+    select: false,
+  })
+  lastLogin?: Date;
 }
