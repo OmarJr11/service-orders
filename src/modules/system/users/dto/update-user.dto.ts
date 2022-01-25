@@ -1,22 +1,19 @@
-import {
-  MaxLength,
-  IsNotEmpty,
-  IsOptional,
-  IsPhoneNumber,
-} from 'class-validator';
+import { IsOptional, IsPhoneNumber, IsEmail } from 'class-validator';
 export class UpdateUserDto {
-  @IsNotEmpty()
-  @MaxLength(50)
-  firstName: string;
-
-  @IsNotEmpty()
-  @MaxLength(50)
-  lastName: string;
-
-  @IsNotEmpty()
-  @IsPhoneNumber()
-  telephone: string;
+  @IsOptional()
+  firstName?: string;
 
   @IsOptional()
-  services?: string[];
+  lastName?: string;
+
+  @IsOptional()
+  password?: string;
+
+  @IsOptional()
+  @IsEmail()
+  email?: string;
+
+  @IsOptional()
+  @IsPhoneNumber()
+  telephone?: string;
 }

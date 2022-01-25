@@ -6,9 +6,4 @@ export class CreateTicketDto {
   @Type(() => Number)
   @IsNumber()
   idService: number;
-
-  @IsNotEmpty()
-  @Type(() => Number)
-  @IsNumber()
-  idUser: number;
 }

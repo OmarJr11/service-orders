@@ -7,6 +7,10 @@ import configuration from './config/configuration';
 import { ServiceRequestModule } from './modules/public/service-request/service-request.module';
 import { ServiceModule } from './modules/public/service/service.module';
 import { TicketModule } from './modules/public/ticket/ticket.module';
+import { AuthModule } from './modules/system/auth/auth.module';
+import { RolesModule } from './modules/system/roles/roles.module';
+import { TokensModule } from './modules/system/tokens/tokens.module';
+import { UserRolesModule } from './modules/system/user-roles/user-roles.module';
 import { UsersModule } from './modules/system/users/users.module';
 
 @Module({
@@ -35,6 +39,10 @@ import { UsersModule } from './modules/system/users/users.module';
     ServiceModule,
     ServiceRequestModule,
     TicketModule,
+    RolesModule,
+    UserRolesModule,
+    TokensModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,8 +1,12 @@
 import { Status } from '../../common/enum/status.enum';
 import { ObjectLiteral, Repository } from 'typeorm';
+import { Request } from 'express';
 
 export class DataProvider<Entity extends ObjectLiteral> {
-  constructor(private readonly _repository: Repository<Entity>) {}
+  constructor(
+    private readonly _request: Request,
+    private readonly _repository: Repository<Entity>,
+  ) {}
 
   /**
    * Set the status of the entity as Active
@@ -43,7 +47,6 @@ export class DataProvider<Entity extends ObjectLiteral> {
 
     const characters =
       options && options.trim() !== '' ? options : process.env.ENCRYPTION_CHARS;
-    console.log(process.env.ENCRYPTION_CHARS);
 
     for (let i = 0; i < length; i++) {
       result += characters.charAt(
@@ -73,9 +76,19 @@ export class DataProvider<Entity extends ObjectLiteral> {
    * @param {number} [user] - User performing the request
    * @returns {Promise<Entity>} - Entity saved
    */
-  protected async save(data: any): Promise<Entity> {
+  protected async save(data: any, user?: number): Promise<Entity> {
+    if (!isNaN(+user)) {
+      data.creator = +user;
+    }
+
+    const userRequest = this.getUserFromRequest();
+    if (!data.creator && !isNaN(+userRequest) && userRequest) {
+      data.creator = +userRequest;
+    }
+
     data.status =
       !data.status || data.status.trim() === '' ? 'Active' : data.status.trim();
+
     return this.cleanDataAfterSave(await this._repository.save(data));
   }
 
@@ -88,7 +101,17 @@ export class DataProvider<Entity extends ObjectLiteral> {
   protected async saveAndGetRelations(
     data: any,
     relations: string[],
+    user?: number,
   ): Promise<Entity> {
+    if (!isNaN(+user)) {
+      data.creator = +user;
+    }
+
+    const userRequest = this.getUserFromRequest();
+    if (!data.creator && !isNaN(+userRequest) && userRequest) {
+      data.creator = +userRequest;
+    }
+
     data.status =
       !data.status || data.status.trim() === '' ? 'Active' : data.status.trim();
 
@@ -124,9 +147,25 @@ export class DataProvider<Entity extends ObjectLiteral> {
    * @returns {Promise<Entity>} - Entity Cleaned
    */
   private cleanDataAfterSave(data: Entity): Entity {
+    delete data.creator;
     delete data.creationDate;
+    delete data.modifier;
     delete data.modificationDate;
+    delete data.password;
+    delete data.lastLogin;
 
     return data;
+  }
+
+  /**
+   * Get id of the user that is making the request
+   * @returns {number} - Id number of the user
+   */
+  private getUserFromRequest(): number {
+    if (this._request.user && !isNaN(+this._request.user['id'])) {
+      return +this._request.user['id'];
+    }
+
+    return null;
   }
 }

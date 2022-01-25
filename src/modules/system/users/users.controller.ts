@@ -6,49 +6,52 @@ import {
   Param,
   Delete,
   Put,
+  UseInterceptors,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ServiceDto } from './dto/service.dto';
+import { TokenHeaderInterceptor } from '../../../common/token.interceptor.ts/token.interceptor';
+import { RolesEnum } from '../../../common/enum/roles.enum';
+import { JwtAuthGuard } from '../../../common/guards/jwtAuth.guard';
+import { IUserReq } from '../../../common/interfaces/user-req.interface';
+import { UserDec } from '../../../common/decorators/user.decorator';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
+  @Post('')
+  @UseInterceptors(TokenHeaderInterceptor)
   async create(@Body() createUserDto: CreateUserDto) {
     return {
       success: true,
-      user: await this.usersService.create(createUserDto),
+      ...(await this.usersService.create(createUserDto)),
     };
   }
 
-  @Get()
-  async findAll() {
+  @Post('technical')
+  @UseInterceptors(TokenHeaderInterceptor)
+  async createTechnical(@Body() data: CreateUserDto) {
     return {
       success: true,
-      users: await this.usersService.findAll(),
+      ...(await this.usersService.create(data, RolesEnum.TECHNICAL)),
     };
   }
 
-  @Get('technical')
-  async findAllTechnical() {
+  @Post('admin')
+  @UseInterceptors(TokenHeaderInterceptor)
+  async createAdmin(@Body() data: CreateUserDto) {
     return {
       success: true,
-      users: await this.usersService.findAll('Technical'),
-    };
-  }
-
-  @Get('clients')
-  async findAllUser() {
-    return {
-      success: true,
-      users: await this.usersService.findAll('User'),
+      ...(await this.usersService.create(data, RolesEnum.ADMIN)),
     };
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') id: number) {
     return {
       success: true,
@@ -56,35 +59,44 @@ export class UsersController {
     };
   }
 
-  @Put(':id')
-  async addService(@Param('id') id: number, @Body() serviceDto: ServiceDto) {
-    return {
-      success: true,
-      user: await this.usersService.addService(id, serviceDto.service),
-    };
-  }
-
-  @Put(':id/delete')
-  async deleteService(@Param('id') id: number, @Body() serviceDto: ServiceDto) {
-    return {
-      success: true,
-      user: await this.usersService.removeService(id, serviceDto.service),
-    };
-  }
-
-  @Put(':id/:type')
+  @Put('')
+  @UseGuards(JwtAuthGuard)
   async update(
-    @Param('id') id: number,
-    @Param('type') type: string,
     @Body() updateUserDto: UpdateUserDto,
+    @UserDec() user: IUserReq,
   ) {
     return {
       success: true,
-      user: await this.usersService.update(id, type, updateUserDto),
+      user: await this.usersService.update(user.userId, updateUserDto),
+    };
+  }
+
+  @Put('add-service')
+  @UseGuards(JwtAuthGuard)
+  async addService(@Body() serviceDto: ServiceDto, @UserDec() user: IUserReq) {
+    return {
+      success: true,
+      user: await this.usersService.addService(user.userId, serviceDto.service),
+    };
+  }
+
+  @Put('delete-service')
+  @UseGuards(JwtAuthGuard)
+  async deleteService(
+    @Body() serviceDto: ServiceDto,
+    @UserDec() user: IUserReq,
+  ) {
+    return {
+      success: true,
+      user: await this.usersService.removeService(
+        user.userId,
+        serviceDto.service,
+      ),
     };
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   async remove(@Param('id') id: number) {
     return {
       success: true,

@@ -6,6 +6,7 @@ import { Ticket } from '../../../models/ticket.entity';
 import { ServiceModule } from '../service/service.module';
 import { UsersModule } from '../../../modules/system/users/users.module';
 import { ServiceRequestModule } from '../service-request/service-request.module';
+import { UserRolesModule } from '../../../modules/system/user-roles/user-roles.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ServiceRequestModule } from '../service-request/service-request.module'
     ServiceModule,
     UsersModule,
     ServiceRequestModule,
+    UserRolesModule,
   ],
   controllers: [TicketController],
   providers: [TicketService],

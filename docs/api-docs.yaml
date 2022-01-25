@@ -1,0 +1,1291 @@
+openapi: 3.0.1
+info:
+  title: API Service Request
+  description: >-
+    This API is responsible for managing the information from the technical test
+    database.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+tags:
+  - name: users
+    description: This endpoint handles all information related to user information.
+  - name: auth
+    description: This endpoint handles all information related to auth information.
+  - name: ticket
+    description: This endpoint handles all information related to ticket information.
+  - name: service-request
+    description: >-
+      This endpoint handles all information related to service request
+      information.
+  - name: service
+    description: This endpoint handles all information related to service information.
+paths:
+  /users:
+    post:
+      tags:
+        - users
+      summary: Insert a new user in the database.
+      requestBody:
+        content:
+          aplication/json:
+            schema:
+              $ref: '#/components/schemas/BodyUserPost'
+        required: true
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/userCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags:
+        - users
+      summary: Insert a new user in the database.
+      parameters:
+        - $ref: '#/components/parameters/token'
+      requestBody:
+        content:
+          aplication/json:
+            schema:
+              $ref: '#/components/schemas/BodyTechnicalPost'
+        required: true
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/technicalCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /users/{idUser}:
+    get:
+      tags:
+        - users
+      summary: get one user in the database.
+      parameters:
+        - $ref: '#/components/parameters/token'
+        - name: idUser
+          in: path
+          description: User id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/technicalCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /users/technical:
+    post:
+      tags:
+        - users
+      summary: Insert a new technical in the database.
+      requestBody:
+        content:
+          aplication/json:
+            schema:
+              $ref: '#/components/schemas/BodyUserPost'
+        required: true
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/technicalCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /users/admin:
+    post:
+      tags:
+        - users
+      summary: Insert a new admin in the database.
+      requestBody:
+        content:
+          aplication/json:
+            schema:
+              $ref: '#/components/schemas/BodyUserPost'
+        required: true
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/userCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /users/add-service:
+    put:
+      tags:
+        - users
+      summary: Insert a new service del Technical in the database.
+      parameters:
+        - $ref: '#/components/parameters/token'
+      requestBody:
+        content:
+          aplication/json:
+            schema:
+              $ref: '#/components/schemas/serviceAddBody'
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/serviceAdd'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /users/delete-service:
+    put:
+      tags:
+        - users
+      summary: Delete a service of technical in the database.
+      parameters:
+        - $ref: '#/components/parameters/token'
+      requestBody:
+        content:
+          aplication/json:
+            schema:
+              $ref: '#/components/schemas/serviceAddBody'
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/serviceAdd'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /users/delete/{idUser}:
+    delete:
+      tags:
+        - users
+      summary: Delete a service of technical in the database.
+      parameters:
+        - $ref: '#/components/parameters/token'
+        - name: idUser
+          in: path
+          description: User id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: User deleted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: Login in the Aplication
+      parameters:
+        - $ref: '#/components/parameters/token'
+      requestBody:
+        content:
+          aplication/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: User mail
+                password:
+                  type: string
+                  description: User password
+        required: true
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/userCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /ticket:
+    post:
+      tags:
+        - ticket
+      summary: Insert a new ticket in the database.
+      parameters:
+        - $ref: '#/components/parameters/token'
+      requestBody:
+        content:
+          aplication/json:
+            schema:
+              type: object
+              properties:
+                idService:
+                  type: string
+                  description: Service to Resquest
+        required: true
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/ticketCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    get:
+      tags:
+        - ticket
+      summary: Get all ticket in the database
+      parameters:
+        - $ref: '#/components/parameters/token'
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/getAllTicketCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /ticket/{idTicket}:
+    get:
+      tags:
+        - ticket
+      summary: Get ticket by id in the database
+      parameters:
+        - $ref: '#/components/parameters/token'
+        - name: idTicket
+          in: path
+          description: User id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/ticketCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /ticket/{idTicket}/managed:
+    put:
+      tags:
+        - ticket
+      summary: Managed ticket in the database
+      parameters:
+        - $ref: '#/components/parameters/token'
+        - name: idTicket
+          in: path
+          description: User id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/ticketManaged'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /ticket/{idTicket}/cancelled:
+    put:
+      tags:
+        - ticket
+      summary: Cancelled ticket in the database
+      parameters:
+        - $ref: '#/components/parameters/token'
+        - name: idTicket
+          in: path
+          description: User id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/ticketCancelled'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /service-request:
+    get:
+      tags:
+        - service-request
+      summary: Get all service requests of technical in the database
+      parameters:
+        - $ref: '#/components/parameters/token'
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/getAllServiceRequestCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /service:
+    description: This endpoint handles all information related to user information.
+    post:
+      tags:
+        - service
+      summary: Insert a new service in the database
+      parameters:
+        - $ref: '#/components/parameters/token'
+      requestBody:
+        content:
+          aplication/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Service name
+                price:
+                  type: number
+                  description: Service price
+        required: true
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/serviceCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    get:
+      tags:
+        - service
+      summary: Get all in the database
+      parameters:
+        - $ref: '#/components/parameters/token'
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/allServices'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /service/{idService}:
+    get:
+      tags:
+        - service
+      summary: Get one service in the database
+      parameters:
+        - $ref: '#/components/parameters/token'
+        - name: idService
+          in: path
+          description: Service id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/serviceCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags:
+        - service
+      summary: Update service in the database
+      parameters:
+        - $ref: '#/components/parameters/token'
+        - name: idService
+          in: path
+          description: Service id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/serviceCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags:
+        - service
+      summary: Delete service in the database
+      parameters:
+        - $ref: '#/components/parameters/token'
+        - name: idService
+          in: path
+          description: Service id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Service deleted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /service/{idService}/activate:
+    put:
+      tags:
+        - service
+      summary: Activate service in the database
+      parameters:
+        - $ref: '#/components/parameters/token'
+        - name: idService
+          in: path
+          description: Service id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/serviceCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /service/{idService}/disable:
+    put:
+      tags:
+        - service
+      summary: Activate service in the database
+      parameters:
+        - $ref: '#/components/parameters/token'
+        - name: idService
+          in: path
+          description: Service id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: success
+          content:
+            aplication/json:
+              schema:
+                $ref: '#/components/schemas/serviceDesactivate'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+components:
+  responses:
+    Unauthorized:
+      description: (Unauthorized) no authorization when calling the service
+    NotFound:
+      description: (NotFound) the information was not found
+    BadRequest:
+      description: (BadRequest) the data sent is incorrect
+    ServerError:
+      description: (ServerError) the data sent is incorrect
+  parameters:
+    token:
+      name: token
+      in: header
+      description: Authentication token
+      required: true
+  schemas:
+    BodyUserPost:
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: User First name
+        lastName:
+          type: string
+          description: User last name
+        email:
+          type: string
+          description: User email
+        password:
+          type: string
+          description: User password
+        telephone:
+          type: string
+          description: User telephone
+    BodyTechnicalPost:
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: User First name
+        lastName:
+          type: string
+          description: User last name
+        email:
+          type: string
+          description: User email
+        password:
+          type: string
+          description: User password
+        telephone:
+          type: string
+          description: User telephone
+        services:
+          type: array
+          items:
+            type: string
+          description: technical Services
+    userCreated:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: User ID
+            firstName:
+              type: string
+              description: User First name
+            lastName:
+              type: string
+              description: User last name
+            email:
+              type: string
+              description: User email
+            password:
+              type: string
+              description: User password
+            status:
+              type: string
+              description: User status
+            telephone:
+              type: string
+              description: User telephone
+          example:
+            firstName: Cliente2
+            lastName: lastName
+            email: cliente2@gmail.com
+            telephone: '+584121574000'
+            status: Active
+            id: 7
+    technicalCreated:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: User ID
+            firstName:
+              type: string
+              description: User First name
+            lastName:
+              type: string
+              description: User last name
+            email:
+              type: string
+              description: User email
+            password:
+              type: string
+              description: User password
+            status:
+              type: string
+              description: User status
+            telephone:
+              type: string
+              description: User telephone
+            services:
+              type: array
+              items:
+                type: string
+              description: technical Services
+          example:
+            firstName: Cliente2
+            lastName: lastName
+            email: cliente2@gmail.com
+            telephone: '+584121574000'
+            status: Active
+            id: 7
+            services:
+              - Maintanance
+              - Support
+    serviceAddBody:
+      type: object
+      properties:
+        service:
+          type: string
+    serviceAdd:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        services:
+          type: array
+          items:
+            type: string
+          description: technical Services
+          example:
+            - Maintanance
+            - Support
+    ticketCreated:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        ticket:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: Ticket ID
+            token:
+              type: string
+              description: Ticket token
+            status:
+              type: string
+              description: Ticket status
+            service:
+              type: object
+              description: Service to request
+              properties:
+                id:
+                  type: integer
+                  description: Service ID
+                name:
+                  type: string
+                  description: Service name
+                price:
+                  type: number
+                  description: Service Price
+                status:
+                  type: string
+                  description: Service status
+            creator:
+              type: object
+              description: User Creator of ticket
+              properties:
+                id:
+                  type: integer
+                  description: user ID
+                firstName:
+                  type: string
+                  description: First name
+                lastName:
+                  type: string
+                  description: Last name
+                email:
+                  type: string
+                  description: user email
+                status:
+                  type: string
+                  description: Service status
+                telephone:
+                  type: string
+                  description: User telephone
+          example:
+            id: '36'
+            token: >-
+              ElxcO353uWmXz1qDtYbXuevssirdRCwjHtTpqNLlu89Wpkrh72hGFeAmB45f2aHNgXasSccpBa9MYvuejiqcCiO9sFeXsM7kQBI7
+            status: Active
+            service:
+              id: '2'
+              name: Installation
+              price: '70.0000'
+              status: Active
+            creator":
+              id: '9'
+              firstName: Cliente2
+              lastName: lastName
+              email: cliente2@gmail.com
+              status: Active
+              telephone: '+584121574000'
+    ticketManaged:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        ticket:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: Ticket ID
+            token:
+              type: string
+              description: Ticket token
+            status:
+              type: string
+              description: Ticket status
+            service:
+              type: object
+              description: Service to request
+              properties:
+                id:
+                  type: integer
+                  description: Service ID
+                name:
+                  type: string
+                  description: Service name
+                price:
+                  type: number
+                  description: Service Price
+                status:
+                  type: string
+                  description: Service status
+            creator:
+              type: object
+              description: User Creator of ticket
+              properties:
+                id:
+                  type: integer
+                  description: user ID
+                firstName:
+                  type: string
+                  description: First name
+                lastName:
+                  type: string
+                  description: Last name
+                email:
+                  type: string
+                  description: user email
+                status:
+                  type: string
+                  description: Service status
+                telephone:
+                  type: string
+                  description: User telephone
+          example:
+            id: '36'
+            token: >-
+              ElxcO353uWmXz1qDtYbXuevssirdRCwjHtTpqNLlu89Wpkrh72hGFeAmB45f2aHNgXasSccpBa9MYvuejiqcCiO9sFeXsM7kQBI7
+            status: Managed
+            service:
+              id: '2'
+              name: Installation
+              price: '70.0000'
+              status: Active
+    ticketCancelled:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        ticket:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: Ticket ID
+            token:
+              type: string
+              description: Ticket token
+            status:
+              type: string
+              description: Ticket status
+            service:
+              type: object
+              description: Service to request
+              properties:
+                id:
+                  type: integer
+                  description: Service ID
+                name:
+                  type: string
+                  description: Service name
+                price:
+                  type: number
+                  description: Service Price
+                status:
+                  type: string
+                  description: Service status
+            creator:
+              type: object
+              description: User Creator of ticket
+              properties:
+                id:
+                  type: integer
+                  description: user ID
+                firstName:
+                  type: string
+                  description: First name
+                lastName:
+                  type: string
+                  description: Last name
+                email:
+                  type: string
+                  description: user email
+                status:
+                  type: string
+                  description: Service status
+                telephone:
+                  type: string
+                  description: User telephone
+          example:
+            id: '36'
+            token: >-
+              ElxcO353uWmXz1qDtYbXuevssirdRCwjHtTpqNLlu89Wpkrh72hGFeAmB45f2aHNgXasSccpBa9MYvuejiqcCiO9sFeXsM7kQBI7
+            status: Cancelled
+            service:
+              id: '2'
+              name: Installation
+              price: '70.0000'
+              status: Active
+    getAllTicketCreated:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        ticket:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: Ticket ID
+              token:
+                type: string
+                description: Ticket token
+              status:
+                type: string
+                description: Ticket status
+              service:
+                type: object
+                description: Service to request
+                properties:
+                  id:
+                    type: integer
+                    description: Service ID
+                  name:
+                    type: string
+                    description: Service name
+                  price:
+                    type: number
+                    description: Service Price
+                  status:
+                    type: string
+                    description: Service status
+              creator:
+                type: object
+                description: User Creator of ticket
+                properties:
+                  id:
+                    type: integer
+                    description: user ID
+                  firstName:
+                    type: string
+                    description: First name
+                  lastName:
+                    type: string
+                    description: Last name
+                  email:
+                    type: string
+                    description: user email
+                  status:
+                    type: string
+                    description: Service status
+                  telephone:
+                    type: string
+                    description: User telephone
+          example:
+            - id: '36'
+              token: >-
+                ElxcO353uWmXz1qDtYbXuevssirdRCwjHtTpqNLlu89Wpkrh72hGFeAmB45f2aHNgXasSccpBa9MYvuejiqcCiO9sFeXsM7kQBI7
+              status: Active
+              service:
+                id: '2'
+                name: Installation
+                price: '70.0000'
+                status: Active
+              creator":
+                id: '9'
+                firstName: Cliente2
+                lastName: lastName
+                email: cliente2@gmail.com
+                status: Active
+                telephone: '+584121574000'
+            - id: '36'
+              token: >-
+                ElxcO353uWmXz1qDtYbXuevssirdRCwjHtTpqNLlu89Wpkrh72hGFeAmB45f2aHNgXasSccpBa9MYvuejiqcCiO9sFeXsM7kQBI7
+              status: Active
+              service:
+                id: '2'
+                name: Installation
+                price: '70.0000'
+                status: Active
+              creator":
+                id: '9'
+                firstName: Cliente2
+                lastName: lastName
+                email: cliente2@gmail.com
+                status: Active
+                telephone: '+584121574000'
+    getAllServiceRequestCreated:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        serviceRequests:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: Ticket ID
+              status:
+                type: string
+                description: Ticket status
+              ticket:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: Ticket ID
+                    token:
+                      type: string
+                      description: Ticket token
+                    status:
+                      type: string
+                      description: Ticket status
+                    service:
+                      type: object
+                      description: Service to request
+                      properties:
+                        id:
+                          type: integer
+                          description: Service ID
+                        name:
+                          type: string
+                          description: Service name
+                        price:
+                          type: number
+                          description: Service Price
+                        status:
+                          type: string
+                          description: Service status
+                    creator:
+                      type: object
+                      description: User Creator of ticket
+                      properties:
+                        id:
+                          type: integer
+                          description: user ID
+                        firstName:
+                          type: string
+                          description: First name
+                        lastName:
+                          type: string
+                          description: Last name
+                        email:
+                          type: string
+                          description: user email
+                        status:
+                          type: string
+                          description: Service status
+                        telephone:
+                          type: string
+                          description: User telephone
+          example:
+            - id: '3'
+              status: Active
+              ticket:
+                id": '27'
+                token: >-
+                  FpXLZljOBrfy2EZYUdzbwiM6sQqbzVdF22rOg6CEyJSSITcX9zPwRyQOejGH5NiktKJEWFiL4KnMypqGZf1YoYTFdja4jf1Y99lU
+                status: Active
+                service:
+                  id: '2'
+                  name: Installation
+                  price: '70.0000'
+                  status: Active
+                creator:
+                  id": '1'
+                  firstName: Cliente2
+                  lastName: lastName
+                  email: cliente@gmail.com
+                  status: Active
+                  telephone: '+584121574000'
+                  services: null
+            - id": '4'
+              status: Active
+              ticket:
+                id: '28'
+                token: >-
+                  LIPM7rGVHG7X9zDDJT9tmRz7l3LDkzQya6NXXhx5pKqFXuIdsDJK6NPtl7O1kb4gSpgDY3MezLOBTZWmzBJorLxehpamwuf6C2nv
+                status: Active
+                service:
+                  id: '2'
+                  name: Installation
+                  price: '70.0000'
+                  status: Active
+                creator:
+                  id": '1'
+                  firstName": Cliente2
+                  lastName": lastName
+                  email": cliente@gmail.com
+                  status": Active
+                  telephone": '+584121574000'
+                  services": null
+    serviceCreated:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        service:
+          type: object
+          description: Service to request
+          properties:
+            id:
+              type: integer
+              description: Service ID
+            name:
+              type: string
+              description: Service name
+            price:
+              type: number
+              description: Service Price
+            status:
+              type: string
+              description: Service status
+          example:
+            id: '2'
+            name: Installation
+            price: '70.0000'
+            status: Active
+    serviceDesactivate:
+      properties:
+        success:
+          type: boolean
+          example: true
+        service:
+          type: object
+          description: Service to request
+          properties:
+            id:
+              type: integer
+              description: Service ID
+            name:
+              type: string
+              description: Service name
+            price:
+              type: number
+              description: Service Price
+            status:
+              type: string
+              description: Service status
+          example:
+            id: '2'
+            name: Installation
+            price: '70.0000'
+            status: Desactive
+    allServices:
+      properties:
+        success:
+          type: boolean
+          example: true
+        service:
+          type: array
+          description: Service to request
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: Service ID
+              name:
+                type: string
+                description: Service name
+              price:
+                type: number
+                description: Service Price
+              status:
+                type: string
+                description: Service status
+          example:
+            - id: '2'
+              name: Installation
+              price: '70.0000'
+              status: Active
+            - id: '2'
+              name: Installation
+              price: '70.0000'
+              status: Active

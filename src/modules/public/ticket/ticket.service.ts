@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable, Scope } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Ticket } from '../../../models/ticket.entity';
 import { Not, Repository } from 'typeorm';
@@ -6,50 +6,56 @@ import { CreateTicketDto } from './dto/create-ticket.dto';
 import { DataProvider } from '../../../common/providers/data.provider';
 import { ServiceService } from '../service/service.service';
 import { UsersService } from '../../../modules/system/users/users.service';
-import { RolesEnum } from '../../../common/enum/roles.enum';
 import { ServiceRequestService } from '../service-request/service-request.service';
 import { Status } from '../../../common/enum/status.enum';
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
+import { IUserReq } from '../../../common/interfaces/user-req.interface';
+import { UserRolesService } from '../../../modules/system/user-roles/user-roles.service';
+import { RolesEnum } from '../../../common/enum/roles.enum';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class TicketService extends DataProvider<Ticket> {
-  private readonly _relations = ['service', 'user'];
+  private readonly _relations = ['service', 'creator'];
 
   constructor(
+    @Inject(REQUEST)
+    private readonly _userRequest: Request,
     @InjectRepository(Ticket)
     private readonly _ticketRepository: Repository<Ticket>,
     private readonly _servicesService: ServiceService,
     private readonly _userService: UsersService,
     private readonly _serviceRequestService: ServiceRequestService,
+    private readonly _userRolesService: UserRolesService,
   ) {
-    super(_ticketRepository);
+    super(_userRequest, _ticketRepository);
   }
 
   /**
    * Create Ticket
    * @param {CreateTicketDto} createTicketDto - data to create ticket
+   * @param {IUserReq} userReq - user logged
    * @returns {Promise<Ticket>}
    */
-  async create(createTicketDto: CreateTicketDto): Promise<Ticket> {
+  async create(
+    createTicketDto: CreateTicketDto,
+    userReq: IUserReq,
+  ): Promise<Ticket> {
+    await this._userRolesService.getUserWithRole(
+      userReq.userId,
+      RolesEnum.USER,
+    );
+
     const service = await this._servicesService.findOne(
       createTicketDto.idService,
     );
 
-    const user = await this._userService.findOne(createTicketDto.idUser);
-
-    if (user.type === RolesEnum.TECHNICAL) {
-      throw new ForbiddenException({
-        success: false,
-        message: 'You do not have Permission',
-      });
-    }
-
-    const ticket = await this.saveAndGetRelations(
+    const ticket = await this.save(
       {
         service: service.id,
-        user: user.id,
         token: await this.generateToken(100),
       },
-      this._relations,
+      userReq.userId,
     ).catch(() => {
       throw new ForbiddenException({
         success: false,
@@ -62,7 +68,7 @@ export class TicketService extends DataProvider<Ticket> {
       idTicket: +ticket.id,
     });
 
-    return ticket;
+    return await this.findOne(ticket.id);
   }
 
   /**
@@ -73,9 +79,8 @@ export class TicketService extends DataProvider<Ticket> {
     const tickets = await this._ticketRepository
       .createQueryBuilder('T')
       .leftJoinAndSelect('T.service', 'S')
-      .leftJoinAndSelect('T.user', 'U')
-      .where('T.status <> :status', { status: Not(Status.DELETED) })
-      .andWhere('T.status <> :status', { status: Not(Status.MANAGED) })
+      .leftJoinAndSelect('T.creator', 'U')
+      .where('T.status = :status', { status: Status.ACTIVE })
       .getMany();
 
     return tickets;
@@ -91,6 +96,7 @@ export class TicketService extends DataProvider<Ticket> {
       .findOneOrFail(
         {
           id,
+          status: Not(Status.CANCELLED),
         },
         {
           relations: this._relations,
@@ -109,14 +115,23 @@ export class TicketService extends DataProvider<Ticket> {
    * Change ticket status to Managed or Cancelled
    * @param {number} id - ticket id
    * @param {string} status - ticket status, Managed or Cancelled
+   * @param {IUserReq} userReq - user logged
    * @returns {Promise<Ticket>}
    */
-  async changeStatus(id: number, status: string): Promise<Ticket> {
+  async changeStatus(
+    id: number,
+    status: string,
+    user: IUserReq,
+  ): Promise<Ticket> {
     const ticket = await this.findOne(id);
 
-    const managedTicket = await this.updateEntity(ticket, {
-      status,
-    }).catch(() => {
+    const managedTicket = await this.updateEntity(
+      ticket,
+      {
+        status,
+      },
+      user.userId,
+    ).catch(() => {
       throw new ForbiddenException({
         success: false,
         message: 'You do not have Permission',
