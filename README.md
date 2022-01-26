@@ -10,6 +10,9 @@
 
 - Se debe estar parado en la rama develop
 
+- Es necesario crear un usuario o loguearse para recibir el token de autenticación por el header
+
+
 ## Instalación
 
 ```bash
