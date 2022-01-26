@@ -61,11 +61,7 @@ export class ServiceController {
   }
 
   @Put(':id/activate')
-  async activate(
-    @Param('id') id: number,
-    @Body() updateServiceDto: UpdateServiceDto,
-    @UserDec() user: IUserReq,
-  ) {
+  async activate(@Param('id') id: number, @UserDec() user: IUserReq) {
     return {
       success: true,
       services: await this.serviceService.changeStatus(id, Status.ACTIVE, user),
