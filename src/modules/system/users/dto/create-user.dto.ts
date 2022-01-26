@@ -25,7 +25,4 @@ export class CreateUserDto {
 
   @IsOptional()
   services?: string[];
-
-  @IsEmpty()
-  origin?: string;
 }

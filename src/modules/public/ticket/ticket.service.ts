@@ -11,8 +11,8 @@ import { Status } from '../../../common/enum/status.enum';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { IUserReq } from '../../../common/interfaces/user-req.interface';
-import { UserRolesService } from '../../../modules/system/user-roles/user-roles.service';
 import { RolesEnum } from '../../../common/enum/roles.enum';
+import { UserRolesService } from '../../../modules/system/user-roles/user-roles.service';
 
 @Injectable({ scope: Scope.REQUEST })
 export class TicketService extends DataProvider<Ticket> {
@@ -123,6 +123,7 @@ export class TicketService extends DataProvider<Ticket> {
     status: string,
     user: IUserReq,
   ): Promise<Ticket> {
+    await this._userRolesService.getUserWithRole(user.userId, RolesEnum.ADMIN);
     const ticket = await this.findOne(id);
 
     const managedTicket = await this.updateEntity(
